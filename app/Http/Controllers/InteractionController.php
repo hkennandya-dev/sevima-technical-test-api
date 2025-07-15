@@ -48,9 +48,18 @@ class InteractionController extends Controller
 
     public function unlike($postId)
     {
-        Like::where('user_id', auth()->id())
+        $like = Like::where('user_id', auth()->id())
             ->where('post_id', $postId)
-            ->delete();
+            ->first();
+
+        if (!$like) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'You can only unlike your own like.'
+            ], 403);
+        }
+
+        $like->delete();
 
         return response()->json([
             'status' => 200,
@@ -101,12 +110,49 @@ class InteractionController extends Controller
         ]);
     }
 
+    public function updateComment(Request $request, $postId, $id)
+    {
+        $this->validate($request, [
+            'content' => 'required|string'
+        ]);
+
+        $comment = Comment::where('post_id', $postId)
+            ->where('id', $id)
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$comment) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'You can only update your own comment.'
+            ], 403);
+        }
+
+        $comment->content = $request->input('content');
+        $comment->save();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Comment updated successfully.',
+            'data' => $comment
+        ]);
+    }
+
     public function deleteComment($postId, $id)
     {
-        Comment::where('user_id', auth()->id())
-            ->where('post_id', $postId)
+        $comment = Comment::where('post_id', $postId)
             ->where('id', $id)
-            ->delete();
+            ->where('user_id', auth()->id())
+            ->first();
+
+        if (!$comment) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'You can only delete your own comment.'
+            ], 403);
+        }
+
+        $comment->delete();
 
         return response()->json([
             'status' => 200,

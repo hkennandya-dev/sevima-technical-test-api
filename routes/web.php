@@ -19,10 +19,10 @@ $router->get('/', function () use ($router) {
 
 $router->post('/register', 'AuthController@register');
 $router->post('/login', 'AuthController@login');
-$router->post('/logout', ['middleware' => 'auth', 'uses' => 'AuthController@logout']);
 
 $router->group(['middleware' => 'auth'], function () use ($router) {
     $router->get('/me', 'AuthController@me');
+    $router->post('/logout', 'AuthController@logout');
 
     $router->get('/posts', 'PostController@index');
     $router->post('/posts', 'PostController@store');
@@ -35,5 +35,6 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
 
     $router->get('/posts/{postId}/comments', 'InteractionController@getComments');
     $router->post('/posts/{postId}/comment', 'InteractionController@comment');
+    $router->put('/posts/{postId}/comment/{id}', 'InteractionController@updateComment');
     $router->delete('/posts/{postId}/comment/{id}', 'InteractionController@deleteComment');
 });

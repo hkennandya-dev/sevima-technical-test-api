@@ -13,9 +13,13 @@ class PostController extends Controller
     {
         $page = (int) $request->query('page', 1);
         $limit = (int) $request->query('paginate', 10);
+        $userId = auth()->id();
 
         $posts = Post::with('user')
             ->withCount(['likes', 'comments'])
+            ->withExists(['likes as is_liked' => function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            }])
             ->latest()
             ->paginate($limit, ['*'], 'page', $page);
 
@@ -33,11 +37,15 @@ class PostController extends Controller
         ]);
     }
 
-
     public function show($id)
     {
+        $userId = auth()->id();
+
         $post = Post::with('user')
             ->withCount(['likes', 'comments'])
+            ->withExists(['likes as is_liked' => function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            }])
             ->findOrFail($id);
 
         return response()->json([
