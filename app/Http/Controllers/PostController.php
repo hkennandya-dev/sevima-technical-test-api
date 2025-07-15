@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Post;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+
+class PostController extends Controller
+{
+    public function index()
+    {
+        $posts = Post::with('user', 'likes', 'comments')->latest()->get();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Post fetched successfully.',
+            'data' => $posts
+        ]);
+    }
+
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'caption' => 'nullable|string',
+            'image' => 'nullable|image|max:2048'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Some fields are invalid.',
+                'error' => $validator->errors()
+            ], 400);
+        }
+
+        if (!$request->hasFile('image') && !$request->filled('caption')) {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Some fields are invalid.',
+                'error' => [
+                    'caption' => ['The caption field is required.']
+                ]
+            ], 400);
+        }
+
+        $path = null;
+        $imageUrl = null;
+
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('posts', 'public');
+
+            $imageUrl = url('storage/' . $path);
+        }
+
+        $post = Post::create([
+            'user_id' => auth()->id(),
+            'caption' => $request->input('caption'),
+            'image_path' => $path
+        ]);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Post created successfully.',
+            'data' => [
+                'id' => $post->id,
+                'user_id' => $post->user_id,
+                'caption' => $post->caption,
+                'image_url' => $imageUrl,
+                'created_at' => $post->created_at,
+                'updated_at' => $post->updated_at
+            ]
+        ]);
+    }
+
+    public function destroy($id)
+    {
+        $post = Post::findOrFail($id);
+
+        if ($post->user_id !== auth()->id()) {
+            return response()->json([
+                'status' => 403,
+                'message' => 'Forbidden action.',
+            ], 403);
+        }
+
+        $post->delete();
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Post deleted successfully.',
+        ]);
+    }
+}

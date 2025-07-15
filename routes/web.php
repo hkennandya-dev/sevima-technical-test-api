@@ -23,4 +23,13 @@ $router->post('/logout', ['middleware' => 'auth', 'uses' => 'AuthController@logo
 
 $router->group(['middleware' => 'auth'], function () use ($router) {
     $router->get('/me', 'AuthController@me');
+
+    $router->get('/posts', 'PostController@index');
+    $router->post('/posts', 'PostController@store');
+    $router->delete('/posts/{id}', 'PostController@destroy');
+
+    $router->post('/posts/{postId}/like', 'InteractionController@like');
+    $router->delete('/posts/{postId}/like', 'InteractionController@unlike');
+
+    $router->post('/posts/{postId}/comment', 'InteractionController@comment');
 });

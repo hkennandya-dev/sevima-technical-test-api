@@ -22,7 +22,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 400,
-                'message' => 'Some fields are invalid',
+                'message' => 'Some fields are invalid.',
                 'error' => $validator->errors()
             ], 400);
         }
@@ -35,7 +35,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 200,
-            'message' => 'Register successfully',
+            'message' => 'Register successfully.',
             'data' => $user
         ], 200);
     }
@@ -50,7 +50,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'status' => 400,
-                'message' => 'Some fields are invalid',
+                'message' => 'Some fields are invalid.',
                 'error' => $validator->errors()
             ], 400);
         }
@@ -60,7 +60,7 @@ class AuthController extends Controller
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => 401,
-                'message' => 'Invalid credentials'
+                'message' => 'Invalid credentials.'
             ], 401);
         }
 
@@ -73,7 +73,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 200,
-            'message' => 'Login successfully',
+            'message' => 'Login successfully.',
             'data' => [
                 'user' => $user,
                 'token' => $token
@@ -88,7 +88,7 @@ class AuthController extends Controller
 
         return response()->json([
             'status' => 200,
-            'message' => 'Logout successfully'
+            'message' => 'Logout successfully.'
         ], 200);
     }
 
@@ -96,7 +96,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'status' => 200,
-            'message' => 'Data fetched successfully',
+            'message' => 'User fetched successfully.',
             'data' => auth()->user()
         ], 200);
     }
