@@ -15,7 +15,16 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app['auth']->viaRequest('api', function ($request) {
+            $token = $request->bearerToken();
+
+            if ($token) {
+                $username = base64_decode($token);
+                return User::where('username', $username)->first();
+            }
+
+            return null;
+        });
     }
 
     /**
