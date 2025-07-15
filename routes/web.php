@@ -26,10 +26,14 @@ $router->group(['middleware' => 'auth'], function () use ($router) {
 
     $router->get('/posts', 'PostController@index');
     $router->post('/posts', 'PostController@store');
+    $router->get('/posts/{id}', 'PostController@show');
     $router->delete('/posts/{id}', 'PostController@destroy');
 
+    $router->get('/posts/{postId}/likes', 'InteractionController@getLikes');
     $router->post('/posts/{postId}/like', 'InteractionController@like');
     $router->delete('/posts/{postId}/like', 'InteractionController@unlike');
 
+    $router->get('/posts/{postId}/comments', 'InteractionController@getComments');
     $router->post('/posts/{postId}/comment', 'InteractionController@comment');
+    $router->delete('/posts/{postId}/comment/{id}', 'InteractionController@deleteComment');
 });

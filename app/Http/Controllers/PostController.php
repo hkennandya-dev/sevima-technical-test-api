@@ -9,17 +9,43 @@ use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $posts = Post::with('user', 'likes', 'comments')->latest()->get();
+        $page = (int) $request->query('page', 1);
+        $limit = (int) $request->query('paginate', 10);
+
+        $posts = Post::with('user')
+            ->withCount(['likes', 'comments'])
+            ->latest()
+            ->paginate($limit, ['*'], 'page', $page);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Posts fetched successfully.',
+            'paginate' => [
+                'is_next' => $posts->hasMorePages(),
+                'is_prev' => $posts->currentPage() > 1,
+                'page' => $posts->currentPage(),
+                'limit' => $posts->perPage(),
+                'total' => $posts->total()
+            ],
+            'data' => $posts->items()
+        ]);
+    }
+
+
+    public function show($id)
+    {
+        $post = Post::with('user')
+            ->withCount(['likes', 'comments'])
+            ->findOrFail($id);
 
         return response()->json([
             'status' => 200,
             'message' => 'Post fetched successfully.',
-            'data' => $posts
+            'data' => $post
         ]);
     }
-
 
     public function store(Request $request)
     {
