@@ -74,6 +74,7 @@ $app->configure('app');
 */
 
 $app->middleware([
+    App\Http\Middleware\CorsMiddleware::class,
     App\Http\Middleware\JsonDefaultResponse::class,
     // App\Http\Middleware\ExampleMiddleware::class
 ]);
