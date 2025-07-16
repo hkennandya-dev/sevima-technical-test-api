@@ -14,7 +14,13 @@
 */
 
 $router->get('/', function () use ($router) {
-    return $router->app->version();
+    return response()->json([
+        'status' => 200,
+        'message' => 'Lumen API is running.',
+        'data' => [
+            'version' => $router->app->version()
+        ]
+    ]);
 });
 
 $router->post('/register', 'AuthController@register');
